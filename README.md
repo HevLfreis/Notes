@@ -91,5 +91,12 @@
     chown -R www-data:www-data /upload
     sudo chmod -R g+w /upload
     ```
+	
+5. git
+	```
+	git rm -r --cached .
+	git add .
+	git commit -m ".gitignore update"
+	```
     
 > If you have any problem, please contact hevlhayt@foxmail.com (ﾉﾟ▽ﾟ)ﾉ
