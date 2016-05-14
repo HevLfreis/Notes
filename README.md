@@ -4,7 +4,7 @@
 
 ## Enviroments
 
-1. MySQL
+1. mysql
     ```
     sudo apt-get install mysql-server mysql-client libmysqlclient-dev
     
@@ -18,7 +18,7 @@
 	[mysqld]
 	lower_case_table_names = 1
     ```
-2. Apache
+2. apache
     ```
     sudo apt-get install apache2
     
@@ -29,7 +29,7 @@
     ```apacheconf
     # apache django
     <VirtualHost *:80>
-        ServerName app.domain.com
+        ServerName djangoapp.domain.com
         # ServerAlias domain.com
         ServerAdmin hevlhayt@foxmail.com
     
@@ -39,16 +39,31 @@
             Require all granted
         </Directory>
 		
-		WSGIDaemonProcess app python-path=/home/user/projects/APP:/home/user/projects/APP/venv/lib/python2.7/site-packages processes=2 threads=15 display-name=%{GLOBAL}
-		WSGIProcessGroup app
-        WSGIScriptAlias / /home/user/projects/APP/wsgi.py
+		WSGIDaemonProcess djangoapp python-path=/home/user/projects/DjangoApp:/home/user/projects/DjangoApp/venv/lib/python2.7/site-packages processes=2 threads=15 display-name=%{GLOBAL}
+		WSGIProcessGroup djangoapp
+        WSGIScriptAlias / /home/user/projects/DjangoApp/wsgi.py
     
-        <Directory /home/user/projects/APP>
+        <Directory /home/user/projects/DjangoApp>
         <Files wsgi.py>
             Require all granted
         </Files>
         </Directory>
     </VirtualHost>
+	
+	# apache flask
+	<VirtualHost *:80>
+		ServerName flaskapp.domain.com
+
+		WSGIDaemonProcess flaskapp python-path=/home/user/projects/FlaskApp:/home/user/projects/FlaskApp/venv/lib/python2.7/site-packages processes=2 threads=15 display-name=%{GLOBAL}
+		WSGIScriptAlias / /home/user/projects/FlaskApp/app.wsgi
+
+		<Directory /home/user/projects/FlaskApp>
+			WSGIProcessGroup flaskapp
+			WSGIApplicationGroup %{GLOBAL}
+			Require all granted
+		</Directory>
+	</VirtualHost>
+
     ```
     ```
     sudo a2ensite site
@@ -59,13 +74,15 @@
     ```
     sudo apt-get install python-pip
     sudo apt-get install python-dev
-    pip install django
-    pip install MySQL-python
-    pip install sqlalchemy
+	
+	sudo pip install MySQL-python
+    sudo pip install sqlalchemy
     ```
     
 4. django
     ```
+	sudo pip install django
+	
     # sync django
     python manage.py makemigrations
     python manage.py migrate
@@ -80,7 +97,7 @@
     import sys
     sys.path.insert(0, PROJECT_DIR)
     
-    os.environ["DJANGO_SETTINGS_MODULE"] = "APP.settings"
+    os.environ["DJANGO_SETTINGS_MODULE"] = "DjangoApp.settings"
     
     from django.core.wsgi import get_wsgi_application
     application = get_wsgi_application()
@@ -91,8 +108,26 @@
     chown -R www-data:www-data /upload
     sudo chmod -R g+w /upload
     ```
+5. flask
+	```
+	sudo pip install Flask
 	
-5. git
+	sudo apt-get install python-virtualenv
+	cd project
+	virtualenv venv
+	```
+	``` python
+	# app.wsgi
+	activate_this = '/home/user/projects/FlaskApp/venv/bin/activate_this.py'
+	execfile(activate_this, dict(__file__=activate_this))
+
+	from yourapp import app as application
+
+	import sys
+	sys.path.insert(0, '/home/user/projects/FlaskApp')
+	```
+	
+6. git
 	```
 	git rm -r --cached .
 	git add .
