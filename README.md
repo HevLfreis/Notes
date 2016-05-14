@@ -11,6 +11,12 @@
     service mysql start
     sudo netstat -tap | grep mysql
     mysql -uroot -p
+	
+	sudo vim /etc/mysql/my.cnf
+	
+	# switch off case sensitive for importing from win
+	[mysqld]
+	lower_case_table_names = 1
     ```
 2. Apache
     ```
@@ -21,21 +27,23 @@
     sudo vim /etc/apache2/sites-available/site.conf
     ```
     ```apacheconf
-    ## Apache django
+    # apache django
     <VirtualHost *:80>
-        ServerName www.domain.com
-        ServerAlias domain.com
+        ServerName app.domain.com
+        # ServerAlias domain.com
         ServerAdmin hevlhayt@foxmail.com
     
-        Alias /static/ /home/user/Project/static/
+        Alias /static/ /home/user/project/static/
     
-        <Directory /home/user/Project/static>
+        <Directory /home/user/project/static>
             Require all granted
         </Directory>
+		
+		WSGIDaemonProcess app python-path=/home/user/projects/APP:/home/user/projects/APP/venv/lib/python2.7/site-packages processes=2 threads=15 display-name=%{GLOBAL}
+		WSGIProcessGroup app
+        WSGIScriptAlias / /home/user/projects/APP/wsgi.py
     
-        WSGIScriptAlias / /home/user/Project/APP/wsgi.py
-    
-        <Directory /home/user/Project/APP>
+        <Directory /home/user/projects/APP>
         <Files wsgi.py>
             Require all granted
         </Files>
@@ -79,7 +87,7 @@
     ```
     
     ```
-    # user upload path
+    # user uploading path
     chown -R www-data:www-data /upload
     sudo chmod -R g+w /upload
     ```
