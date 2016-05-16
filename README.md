@@ -33,17 +33,20 @@
         # ServerAlias domain.com
         ServerAdmin hevlhayt@foxmail.com
     
-        Alias /static/ /home/user/project/static/
+        Alias /static/ /home/user/projects/DjangoApp/static/
     
-        <Directory /home/user/project/static>
+        <Directory /home/user/projects/DjangoApp/static>
             Require all granted
         </Directory>
 		
 		WSGIDaemonProcess djangoapp python-path=/home/user/projects/DjangoApp:/home/user/projects/DjangoApp/venv/lib/python2.7/site-packages processes=2 threads=15 display-name=%{GLOBAL}
 		WSGIProcessGroup djangoapp
-        WSGIScriptAlias / /home/user/projects/DjangoApp/wsgi.py
+        WSGIScriptAlias / /home/user/projects/DjangoApp/DjangoApp/wsgi.py
+		
+		# solving the problem of python packages using native c
+		WSGIApplicationGroup %{GLOBAL}
     
-        <Directory /home/user/projects/DjangoApp>
+        <Directory /home/user/projects/DjangoApp/DjangoApp>
         <Files wsgi.py>
             Require all granted
         </Files>
