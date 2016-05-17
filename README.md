@@ -43,7 +43,7 @@
 		WSGIProcessGroup djangoapp
         WSGIScriptAlias / /home/user/projects/DjangoApp/DjangoApp/wsgi.py
 		
-		# solving the problem of python packages using native c
+		# solving the problem of python packages using native c like scipy
 		WSGIApplicationGroup %{GLOBAL}
     
         <Directory /home/user/projects/DjangoApp/DjangoApp>
@@ -58,11 +58,11 @@
 		ServerName flaskapp.domain.com
 
 		WSGIDaemonProcess flaskapp python-path=/home/user/projects/FlaskApp:/home/user/projects/FlaskApp/venv/lib/python2.7/site-packages processes=2 threads=15 display-name=%{GLOBAL}
+		WSGIProcessGroup flaskapp
 		WSGIScriptAlias / /home/user/projects/FlaskApp/app.wsgi
-
+		WSGIApplicationGroup %{GLOBAL}
+		
 		<Directory /home/user/projects/FlaskApp>
-			WSGIProcessGroup flaskapp
-			WSGIApplicationGroup %{GLOBAL}
 			Require all granted
 		</Directory>
 	</VirtualHost>
@@ -80,6 +80,24 @@
 	
 	sudo pip install MySQL-python
     sudo pip install sqlalchemy
+	
+	sudo pip install virtualenv
+	cd project
+	virtualenv venv
+	
+	# active virtual env
+	source bin/activate
+	pip something in this venv
+	deactivate
+	
+	# install glib
+	sudo apt-get install libglib2.0-dev
+	sudo apt-get install libffi-dev
+	
+	# python markdown
+	sudo pip install misaka
+	
+	
     ```
     
 4. django
@@ -108,6 +126,9 @@
 	# settings.py for deployment
 	DEBUG = False
 	ALLOWED_HOSTS = ['*']
+	
+	# if you have set up the venv for this django, just make sure that you have set the venv path correctly in apache's conf. 
+	# The django will automatically use the project's venv python path.
     ```
     
     ```
@@ -118,15 +139,13 @@
 5. flask
 	```
 	sudo pip install Flask
-	
-	sudo apt-get install python-virtualenv
-	cd project
-	virtualenv venv
 	```
 	``` python
 	# app.wsgi
-	activate_this = '/home/user/projects/FlaskApp/venv/bin/activate_this.py'
-	execfile(activate_this, dict(__file__=activate_this))
+	
+	# you can ignore the two lines below when you make sure that you have set the venv path correctly in apache's conf.
+	# activate_this = '/home/user/projects/FlaskApp/venv/bin/activate_this.py'
+	# execfile(activate_this, dict(__file__=activate_this))
 
 	from yourapp import app as application
 
