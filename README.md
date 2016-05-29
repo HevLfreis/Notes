@@ -10,13 +10,23 @@
     
     service mysql start
     sudo netstat -tap | grep mysql
-    mysql -uroot -p
+    mysql -u root -p
+	
+	mysqldump -u root -p database > dump.sql
 	
 	sudo vim /etc/mysql/my.cnf
 	
 	# switch off case sensitive for importing from win
 	[mysqld]
 	lower_case_table_names = 1
+	
+	# set timeout to avoid mysql has gone away in sqlalchemy 
+	interactive_timeout = 3600
+	wait_timeout = 3600
+	
+	# flask-sqlalchemy
+	# the pool_recycle should be less than timeout 
+	app.config['SQLALCHEMY_POOL_RECYCLE'] = 1800
     ```
 2. apache
     ```
@@ -28,6 +38,7 @@
     ```
     ```apacheconf
     # apache django
+	# mod_wsgi: http://modwsgi.readthedocs.io/en/develop/index.html
     <VirtualHost *:80>
         ServerName djangoapp.domain.com
         # ServerAlias domain.com
@@ -39,7 +50,7 @@
             Require all granted
         </Directory>
 		
-		WSGIDaemonProcess djangoapp python-path=/home/user/projects/DjangoApp:/home/user/projects/DjangoApp/venv/lib/python2.7/site-packages processes=2 threads=15 display-name=%{GLOBAL}
+		WSGIDaemonProcess djangoapp python-path=/home/user/projects/DjangoApp:/home/user/projects/DjangoApp/venv/lib/python2.7/site-packages processes=2 threads=15 display-name=%{GROUP}
 		WSGIProcessGroup djangoapp
         WSGIScriptAlias / /home/user/projects/DjangoApp/DjangoApp/wsgi.py
 		
@@ -57,7 +68,7 @@
 	<VirtualHost *:80>
 		ServerName flaskapp.domain.com
 
-		WSGIDaemonProcess flaskapp python-path=/home/user/projects/FlaskApp:/home/user/projects/FlaskApp/venv/lib/python2.7/site-packages processes=2 threads=15 display-name=%{GLOBAL}
+		WSGIDaemonProcess flaskapp python-path=/home/user/projects/FlaskApp:/home/user/projects/FlaskApp/venv/lib/python2.7/site-packages processes=2 threads=15 display-name=%{GROUP}
 		WSGIProcessGroup flaskapp
 		WSGIScriptAlias / /home/user/projects/FlaskApp/app.wsgi
 		WSGIApplicationGroup %{GLOBAL}
@@ -86,6 +97,7 @@
 	virtualenv venv
 	
 	# active virtual env
+	# in ubuntu, you should add dist-package as PYTHONPATH to .bashrc
 	source bin/activate
 	pip something in this venv
 	deactivate
