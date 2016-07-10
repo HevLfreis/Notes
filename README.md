@@ -12,7 +12,8 @@
     sudo netstat -tap | grep mysql
     mysql -u root -p
 	
-	mysqldump -u root -p database > dump.sql
+	mysqldump -uroot -p database > dump.sql
+	mysql -uroot -p database < dump.sql
 	
 	sudo vim /etc/mysql/my.cnf
 	
@@ -90,6 +91,9 @@
     sudo apt-get install python-dev
 	
 	sudo pip install MySQL-python
+	or ?
+	sudo pip install mysqlclient  
+	
     sudo pip install sqlalchemy
 	
 	sudo pip install virtualenv
@@ -167,6 +171,11 @@
 	
 6. git
 	```
+	git commit -m 'update sth'  
+	git reset --soft
+	git push --force
+	git rebase -i <sha>  
+	
 	git rm -r --cached .
 	git add .
 	git commit -m ".gitignore update"
