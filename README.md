@@ -180,5 +180,53 @@
 	git add .
 	git commit -m ".gitignore update"
 	```
+	
+7. https
+	```
+	https://startssl.com/  > 1_root_bundle.crt, 2_your_domain.crt
+	```
+	```
+	
+	# on server 
+	openssl req -newkey rsa:2048 -keyout server.key -out server.csr
+	a2enmod ssl
+	service apache2 reload
+	
+	netstat -tnap  // 443 listening
+	
+	<VirtualHost *:443>
+        ServerName djangoapp.domain.com
+        # ServerAlias domain.com
+        ServerAdmin hevlhayt@foxmail.com
     
+        Alias /static/ /home/user/projects/DjangoApp/static/
+    
+        <Directory /home/user/projects/DjangoApp/static>
+            Require all granted
+        </Directory>
+				
+		# no daemon settings
+		WSGIProcessGroup djangoapp
+        WSGIScriptAlias / /home/user/projects/DjangoApp/DjangoApp/wsgi.py
+		WSGIApplicationGroup %{GLOBAL}
+    
+        <Directory /home/user/projects/DjangoApp/DjangoApp>
+        <Files wsgi.py>
+            Require all granted
+        </Files>
+        </Directory>
+		SSLEngine On
+		SSLCertificateFile "/etc/apache2/ssl/2_your_domain.crt"
+		SSLCertificateKeyFile "/etc/apache2/ssl/server.key"
+		SSLCertificateChainFile "/etc/apache2/ssl/1_root_bundle.crt"
+    </VirtualHost>
+	```
+	```python
+	# django settings, or using apache to do the https redirect
+	SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+	SECURE_SSL_REDIRECT = True
+	SESSION_COOKIE_SECURE = True
+	```
+	
+	
 > If you have any problem, please contact hevlhayt@foxmail.com (ﾉﾟ▽ﾟ)ﾉ
