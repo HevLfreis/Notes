@@ -90,6 +90,20 @@
     sudo apt-get install python-pip
     sudo apt-get install python-dev
 	
+	```
+	```
+	# config pip in aliyun
+	cd ~/.pip
+	vim pip.conf
+	
+	# pip.conf
+	[global]
+	index-url = http://mirrors.aliyun.com/pypi/simple/
+
+	[install]
+	trusted-host=mirrors.aliyun.com
+	```
+	```	
 	sudo pip install MySQL-python
 	or ?
 	sudo pip install mysqlclient  
@@ -172,7 +186,7 @@
 6. git
 	```
 	git commit -m 'update sth'  
-	git reset --soft
+	git reset --soft <sha>
 	git push --force
 	git rebase -i <sha>  
 	
@@ -194,6 +208,8 @@
 	
 	netstat -tnap  // 443 listening
 	
+	
+	// add to site conf, with port 80
 	<VirtualHost *:443>
         ServerName djangoapp.domain.com
         # ServerAlias domain.com
@@ -227,6 +243,45 @@
 	SECURE_SSL_REDIRECT = True
 	SESSION_COOKIE_SECURE = True
 	```
+
+8. torch and torch-rnn
+	```
+	# python env
+	sudo apt-get install software-properties-common
+	sudo apt-get install python-software-properties
+	sudo apt-get install ipython
+	sudo pip install Cython
 	
+	# pip failed
+	sudo apt-get install python-h5py
+	```
+	```
+	# torch
+	git clone https://github.com/torch/distro.git torch --recursive
+	bash install-deps
+	./install.sh
+	source ~/.bashrc
+
+	th
+	```
+	```
+	# torch-hdf5
+	git clone https://github.com/deepmind/torch-hdf5
+	sudo apt-get install totem
+	
+	cd torch-hdf5
+	luarocks make hdf5-0-0.rockspec
+	```
+	```
+	# torch-rnn
+	git clone https://github.com/jcjohnson/torch-rnn
+	
+	python scripts/preprocess.py \
+	--input_txt my_data.txt \
+	--output_h5 my_data.h5 \
+	--output_json my_data.json
+	
+	setsid th train.lua -input_h5 my_data.h5 -input_json my_data.json | tee my_log.log
+	```
 	
 > If you have any problem, please contact hevlhayt@foxmail.com (ﾉﾟ▽ﾟ)ﾉ
