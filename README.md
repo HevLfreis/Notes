@@ -90,6 +90,9 @@
     sudo apt-get install python-pip
     sudo apt-get install python-dev
 	
+	# hdf5 file system
+	sudo apt-get install libhdf5-dev
+	
 	```
 	```
 	# config pip in aliyun
@@ -163,7 +166,7 @@
     
     ```
     # user uploading path
-    chown -R www-data:www-data /upload
+    sudo chown -R www-data:www-data /upload
     sudo chmod -R g+w /upload
     ```
 5. flask
@@ -252,11 +255,13 @@
 	sudo apt-get install ipython
 	sudo pip install Cython
 	
-	# pip failed
+	# pip failed ?
+	sudo pip install h5py
 	sudo apt-get install python-h5py
 	```
 	```
 	# torch
+	sudo apt-get install git
 	git clone https://github.com/torch/distro.git torch --recursive
 	bash install-deps
 	./install.sh
@@ -276,12 +281,18 @@
 	# torch-rnn
 	git clone https://github.com/jcjohnson/torch-rnn
 	
-	python scripts/preprocess.py \
-	--input_txt my_data.txt \
-	--output_h5 my_data.h5 \
-	--output_json my_data.json
+	python scripts/preprocess.py --input_txt my_data.txt --output_h5 my_data.h5 --output_json my_data.json
 	
-	setsid th train.lua -input_h5 my_data.h5 -input_json my_data.json | tee my_log.log
+	th train.lua -input_h5 my_data.h5 -input_json my_data.json -gpu -1
+	th sample.lua -checkpoint cv/checkpoint_10000.t7 -length 2000 -gpu -1
+	```
+	```
+	# screen
+	sudo apt-get install screen
+	screen -S name
+	screen -ls
+	screen -r id/name
+	screen -X -S name quit
 	```
 	
 > If you have any problem, please contact hevlhayt@foxmail.com (ﾉﾟ▽ﾟ)ﾉ
