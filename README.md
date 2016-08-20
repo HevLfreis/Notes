@@ -3,8 +3,22 @@
 ***
 
 ## Enviroments
-
-1. mysql
+1. ### linux
+	```
+	ps -aux
+	sudo netstat -tap
+	kill -9 $(ps -e | grep xxx | awk '{print $1}')
+	sudo apt-get --purge autoremove xxx
+	
+	# screen
+	sudo apt-get install screen
+	screen -S name
+	screen -ls
+	screen -r id/name
+	screen -X -S name quit
+	```
+	
+2. ### mysql
     ```
     sudo apt-get install mysql-server mysql-client libmysqlclient-dev
     
@@ -29,7 +43,15 @@
 	# the pool_recycle should be less than timeout 
 	app.config['SQLALCHEMY_POOL_RECYCLE'] = 1800
     ```
-2. apache
+	
+3. ### mongodb
+	```
+	sudo apt-get install mongodb
+	mkdir -p /data/db
+	sudo chown -R mongodb:mongodb /data
+	mongo
+	```
+4. ### apache
     ```
     sudo apt-get install apache2
     
@@ -85,14 +107,19 @@
     service apache2 reload
     cat /var/log/apache2/error.log
     ```
-3. python
+	
+5. ### nginx
+	```
+	waiting...
+	```
+	
+6. ### python
     ```
     sudo apt-get install python-pip
     sudo apt-get install python-dev
 	
 	# hdf5 file system
 	sudo apt-get install libhdf5-dev
-	
 	```
 	```
 	# config pip in aliyun
@@ -129,11 +156,9 @@
 	
 	# python markdown
 	sudo pip install misaka
-	
-	
     ```
     
-4. django
+7. ### django
     ```
 	sudo pip install django
 	
@@ -169,7 +194,8 @@
     sudo chown -R www-data:www-data /upload
     sudo chmod -R g+w /upload
     ```
-5. flask
+	
+8. ### flask
 	```
 	sudo pip install Flask
 	```
@@ -186,7 +212,7 @@
 	sys.path.insert(0, '/home/user/projects/FlaskApp')
 	```
 	
-6. git
+9. ### git
 	```
 	git commit -m 'update sth'  
 	git reset --soft <sha>
@@ -198,19 +224,17 @@
 	git commit -m ".gitignore update"
 	```
 	
-7. https
+10. ### https
 	```
 	https://startssl.com/  > 1_root_bundle.crt, 2_your_domain.crt
 	```
 	```
-	
 	# on server 
 	openssl req -newkey rsa:2048 -keyout server.key -out server.csr
 	a2enmod ssl
 	service apache2 reload
 	
 	netstat -tnap  // 443 listening
-	
 	
 	// add to site conf, with port 80
 	<VirtualHost *:443>
@@ -247,7 +271,7 @@
 	SESSION_COOKIE_SECURE = True
 	```
 
-8. torch and torch-rnn
+11. ### torch and torch-rnn
 	```
 	# python env
 	sudo apt-get install software-properties-common
@@ -286,13 +310,16 @@
 	th train.lua -input_h5 my_data.h5 -input_json my_data.json -gpu -1
 	th sample.lua -checkpoint cv/checkpoint_10000.t7 -length 2000 -gpu -1
 	```
+	
+13. ### tensorflow
 	```
-	# screen
-	sudo apt-get install screen
-	screen -S name
-	screen -ls
-	screen -r id/name
-	screen -X -S name quit
+	waiting...
 	```
 	
+14. ### mxnet
+	```
+	waiting...
+	```
+	
+
 > If you have any problem, please contact hevlhayt@foxmail.com (ﾉﾟ▽ﾟ)ﾉ
