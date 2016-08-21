@@ -6,7 +6,7 @@
 1. ### linux
 	```
 	ps -aux
-	sudo netstat -tap
+	netstat -tap
 	kill -9 $(ps -e | grep xxx | awk '{print $1}')
 	sudo apt-get --purge autoremove xxx
 	
@@ -51,6 +51,7 @@
 	sudo chown -R mongodb:mongodb /data
 	mongo
 	```
+	
 4. ### apache
     ```
     sudo apt-get install apache2
@@ -66,14 +67,18 @@
         ServerName djangoapp.domain.com
         # ServerAlias domain.com
         ServerAdmin hevlhayt@foxmail.com
-    
+		
+		Alias /robots.txt /home/user/projects/DjangoApp/static/robots.txt
+		Alias /favicon.ico /home/user/projects/DjangoApp/static/favicon.ico
         Alias /static/ /home/user/projects/DjangoApp/static/
     
         <Directory /home/user/projects/DjangoApp/static>
             Require all granted
         </Directory>
 		
-		WSGIDaemonProcess djangoapp python-path=/home/user/projects/DjangoApp:/home/user/projects/DjangoApp/venv/lib/python2.7/site-packages processes=2 threads=15 display-name=%{GROUP}
+		WSGIDaemonProcess djangoapp python-path=/home/user/projects/DjangoApp:
+			/home/user/projects/DjangoApp/venv/lib/python2.7/site-packages 
+			processes=2 threads=15 display-name=%{GROUP}
 		WSGIProcessGroup djangoapp
         WSGIScriptAlias / /home/user/projects/DjangoApp/DjangoApp/wsgi.py
 		
@@ -91,7 +96,9 @@
 	<VirtualHost *:80>
 		ServerName flaskapp.domain.com
 
-		WSGIDaemonProcess flaskapp python-path=/home/user/projects/FlaskApp:/home/user/projects/FlaskApp/venv/lib/python2.7/site-packages processes=2 threads=15 display-name=%{GROUP}
+		WSGIDaemonProcess flaskapp python-path=/home/user/projects/FlaskApp:
+			/home/user/projects/FlaskApp/venv/lib/python2.7/site-packages 
+			processes=2 threads=15 display-name=%{GROUP}
 		WSGIProcessGroup flaskapp
 		WSGIScriptAlias / /home/user/projects/FlaskApp/app.wsgi
 		WSGIApplicationGroup %{GLOBAL}
@@ -110,7 +117,10 @@
 	
 5. ### nginx
 	```
-	waiting...
+	sudo apt-get install nginx
+	service nginx reload
+	cat /var/log/nginx/error.log
+	ln -s /etc/nginx/sites-available/site /etc/nginx/sites-enabled/site
 	```
 	
 6. ### python
@@ -185,7 +195,8 @@
 	DEBUG = False
 	ALLOWED_HOSTS = ['*']
 	
-	# if you have set up the venv for this django, just make sure that you have set the venv path correctly in apache's conf. 
+	# if you have set up the venv for this django, 
+	# just make sure that you have set the venv path correctly in apache's conf. 
 	# The django will automatically use the project's venv python path.
     ```
     
@@ -202,7 +213,8 @@
 	``` python
 	# app.wsgi
 	
-	# you can ignore the two lines below when you make sure that you have set the venv path correctly in apache's conf.
+	# you can ignore the two lines below when you make sure that 
+	# you have set the venv path correctly in apache's conf.
 	# activate_this = '/home/user/projects/FlaskApp/venv/bin/activate_this.py'
 	# execfile(activate_this, dict(__file__=activate_this))
 
@@ -226,7 +238,8 @@
 	
 10. ### https
 	```
-	https://startssl.com/  > 1_root_bundle.crt, 2_your_domain.crt
+	https://startssl.com/  > 1_root_bundle.crt, 2_your_domain.crt (for apache) 
+							 1_your_domain_bundle.crt (for nginx)
 	```
 	```
 	# on server 
@@ -235,7 +248,8 @@
 	service apache2 reload
 	
 	netstat -tnap  // 443 listening
-	
+	```
+	```apacheconf
 	// add to site conf, with port 80
 	<VirtualHost *:443>
         ServerName djangoapp.domain.com
@@ -270,7 +284,88 @@
 	SECURE_SSL_REDIRECT = True
 	SESSION_COOKIE_SECURE = True
 	```
+	
+11. ### nginx as a front-end balancer with apache
+	```
+	# front-end proxy nginx to serve static
+	# back-end apache to serve dynamic
+	# https://www.linode.com/docs/uptime/loadbalancing/use-nginx-as-a-front-end-proxy-and-software-load-balancer/
+	
+	# serve apache on port 8000 (close 80 and 443)
+	Listen 8000 # only
+	<VirtualHost *:8000> # on every vh
+	
+	# comment out all static on apache, as we will serve js or css through nginx
+	
+	sudo apt-get install libapache2-mod-rpaf # for log
+	```
+	```
+	# /etc/nginx/proxy_params
+	proxy_set_header Host $host;
+	proxy_set_header X-Real-IP $remote_addr;
+	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 
+	client_max_body_size 100M;
+	client_body_buffer_size 1m;
+	proxy_intercept_errors on;
+	proxy_buffering on;
+	proxy_buffer_size 128k;
+	proxy_buffers 256 16k;
+	proxy_busy_buffers_size 256k;
+	proxy_temp_file_write_size 256k;
+	proxy_max_temp_file_size 0;
+	proxy_read_timeout 300;
+	```
+	```
+	# nginx proxy for sites under apache
+	server {
+		listen 80;
+		server_name domain.com;
+
+		location / {
+			proxy_pass http://localhost:8000;
+			include /etc/nginx/proxy_params;
+		}
+
+		location /static/ {
+			root /home/hevlfreis/projects/WebApp;
+			access_log off;
+			error_log off;
+		}
+	}
+	```
+	```
+	# decrypt the private key 
+	openssl rsa -in server.key -out /etc/nginx/conf/server.key
+	
+	# nginx with ssl
+	server {
+	   listen         80;
+	   server_name    domain.com;
+	   return         301 https://$server_name$request_uri;
+	}
+
+	server {
+		listen 443 ssl;
+		server_name domain.com;
+
+		ssl on;
+		ssl_certificate /etc/nginx/ssl/1_domain_bundle.crt;
+		ssl_certificate_key /etc/nginx/ssl/server.key;
+
+		location / {
+			proxy_pass http://localhost:8000;
+			include /etc/nginx/proxy_params;
+		}
+
+		location /static/ {
+			root /home/hevlfreis/projects/WebApp;
+			access_log off;
+			error_log off;
+		}
+	}
+	```
+	
 11. ### torch and torch-rnn
 	```
 	# python env
