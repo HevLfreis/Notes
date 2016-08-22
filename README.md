@@ -1,9 +1,9 @@
-# Server configration
+# Server Notes
 
 ***
 
-## Enviroments
-1. ### linux
+## Linux
+1. ### shell
 	```
 	ps -aux
 	netstat -tap
@@ -18,17 +18,38 @@
 	screen -X -S name quit
 	```
 	
-2. ### mysql
+2. ### git
+	```
+	sudo apt-get install git
+	
+	git commit -m 'update sth'  
+	git reset --soft <sha>
+	git push --force
+	git rebase -i <sha>  
+	
+	git rm -r --cached .
+	git add .
+	git commit -m ".gitignore update"
+	```
+	
+***
+
+## Database
+1. ### mysql
     ```
+	# install
     sudo apt-get install mysql-server mysql-client libmysqlclient-dev
     
     service mysql start
     sudo netstat -tap | grep mysql
     mysql -u root -p
 	
+	# backup and restore
 	mysqldump -uroot -p database > dump.sql
 	mysql -uroot -p database < dump.sql
-	
+	```
+	```
+	# conf
 	sudo vim /etc/mysql/my.cnf
 	
 	# switch off case sensitive for importing from win
@@ -44,7 +65,7 @@
 	app.config['SQLALCHEMY_POOL_RECYCLE'] = 1800
     ```
 	
-3. ### mongodb
+2. ### mongodb
 	```
 	sudo apt-get install mongodb
 	mkdir -p /data/db
@@ -52,7 +73,10 @@
 	mongo
 	```
 	
-4. ### apache
+***
+
+## Server
+1. ### apache
     ```
     sudo apt-get install apache2
     
@@ -91,7 +115,8 @@
         </Files>
         </Directory>
     </VirtualHost>
-	
+	```
+	```apacheconf
 	# apache flask
 	<VirtualHost *:80>
 		ServerName flaskapp.domain.com
@@ -107,167 +132,39 @@
 			Require all granted
 		</Directory>
 	</VirtualHost>
-
     ```
-    ```
-    sudo a2ensite site
-    service apache2 reload
-    cat /var/log/apache2/error.log
-    ```
-	
-5. ### nginx
 	```
-	sudo apt-get install nginx
-	service nginx reload
-	cat /var/log/nginx/error.log
-	ln -s /etc/nginx/sites-available/site /etc/nginx/sites-enabled/site
-	```
+	# apache with ssl
+	a2enmod ssl / a2dismod ssl
+	service apache2 restart
 	
-6. ### python
-    ```
-    sudo apt-get install python-pip
-    sudo apt-get install python-dev
-	
-	# hdf5 file system
-	sudo apt-get install libhdf5-dev
-	```
-	```
-	# config pip in aliyun
-	cd ~/.pip
-	vim pip.conf
-	
-	# pip.conf
-	[global]
-	index-url = http://mirrors.aliyun.com/pypi/simple/
-
-	[install]
-	trusted-host=mirrors.aliyun.com
-	```
-	```	
-	sudo pip install MySQL-python
-	or ?
-	sudo pip install mysqlclient  
-	
-    sudo pip install sqlalchemy
-	
-	sudo pip install virtualenv
-	cd project
-	virtualenv venv
-	
-	# active virtual env
-	# in ubuntu, you should add dist-package as PYTHONPATH to .bashrc
-	source bin/activate
-	pip something in this venv
-	deactivate
-	
-	# install glib
-	sudo apt-get install libglib2.0-dev
-	sudo apt-get install libffi-dev
-	
-	# python markdown
-	sudo pip install misaka
-    ```
-    
-7. ### django
-    ```
-	sudo pip install django
-	
-    # sync django
-    python manage.py makemigrations
-    python manage.py migrate
-    ```
-    ``` python
-    # wsgi.py
-    import os
-    from os.path import dirname, abspath
-    
-    PROJECT_DIR = dirname(dirname(abspath(__file__)))
-    
-    import sys
-    sys.path.insert(0, PROJECT_DIR)
-    
-    os.environ["DJANGO_SETTINGS_MODULE"] = "DjangoApp.settings"
-    
-    from django.core.wsgi import get_wsgi_application
-    application = get_wsgi_application()
-	
-	# settings.py for deployment
-	DEBUG = False
-	ALLOWED_HOSTS = ['*']
-	
-	# if you have set up the venv for this django, 
-	# just make sure that you have set the venv path correctly in apache's conf. 
-	# The django will automatically use the project's venv python path.
-    ```
-    
-    ```
-    # user uploading path
-    sudo chown -R www-data:www-data /upload
-    sudo chmod -R g+w /upload
-    ```
-	
-8. ### flask
-	```
-	sudo pip install Flask
-	```
-	``` python
-	# app.wsgi
-	
-	# you can ignore the two lines below when you make sure that 
-	# you have set the venv path correctly in apache's conf.
-	# activate_this = '/home/user/projects/FlaskApp/venv/bin/activate_this.py'
-	# execfile(activate_this, dict(__file__=activate_this))
-
-	from yourapp import app as application
-
-	import sys
-	sys.path.insert(0, '/home/user/projects/FlaskApp')
-	```
-	
-9. ### git
-	```
-	git commit -m 'update sth'  
-	git reset --soft <sha>
-	git push --force
-	git rebase -i <sha>  
-	
-	git rm -r --cached .
-	git add .
-	git commit -m ".gitignore update"
-	```
-	
-10. ### https
-	```
-	https://startssl.com/  > 1_root_bundle.crt, 2_your_domain.crt (for apache) 
-							 1_your_domain_bundle.crt (for nginx)
-	```
-	```
-	# on server 
-	openssl req -newkey rsa:2048 -keyout server.key -out server.csr
-	a2enmod ssl
-	service apache2 reload
-	
-	netstat -tnap  // 443 listening
+	netstat -tap  # https listening
 	```
 	```apacheconf
-	// add to site conf, with port 80
+	# add to site conf, with port 80
+	# you can do http to https rewrite in apache or simply in django
+	# with front-end nginx, you can use the nginx to do it
+	RewriteEngine On
+	RewriteCond %{HTTPS} off
+	RewriteRule (.*) https://%{SERVER_NAME}/%$1 [R,L]
+	
 	<VirtualHost *:443>
-        ServerName djangoapp.domain.com
+        ServerName webapp.domain.com
         # ServerAlias domain.com
         ServerAdmin hevlhayt@foxmail.com
     
-        Alias /static/ /home/user/projects/DjangoApp/static/
+        Alias /static/ /home/user/projects/WebApp/static/
     
-        <Directory /home/user/projects/DjangoApp/static>
+        <Directory /home/user/projects/WebApp/static>
             Require all granted
         </Directory>
 				
 		# no daemon settings
-		WSGIProcessGroup djangoapp
-        WSGIScriptAlias / /home/user/projects/DjangoApp/DjangoApp/wsgi.py
+		WSGIProcessGroup webapp
+        WSGIScriptAlias / /home/user/projects/WebApp/WebApp/wsgi.py
 		WSGIApplicationGroup %{GLOBAL}
     
-        <Directory /home/user/projects/DjangoApp/DjangoApp>
+        <Directory /home/user/projects/WebApp/WebApp>
         <Files wsgi.py>
             Require all granted
         </Files>
@@ -278,24 +175,30 @@
 		SSLCertificateChainFile "/etc/apache2/ssl/1_root_bundle.crt"
     </VirtualHost>
 	```
-	```python
-	# django settings, or using apache to do the https redirect
-	SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-	SECURE_SSL_REDIRECT = True
-	SESSION_COOKIE_SECURE = True
+    ```
+    sudo a2ensite site / a2dissite site
+    service apache2 start / reload / restart / stop
+    cat /var/log/apache2/error.log
+    ```
+	
+2. ### nginx
+	```
+	sudo apt-get install nginx
+	service nginx start / reload / restart / stop
+	cat /var/log/nginx/error.log
+	ln -s /etc/nginx/sites-available/site /etc/nginx/sites-enabled/site
 	```
 	
-11. ### nginx as a front-end balancer with apache
+3. ### nginx as a front-end balancer with apache on back-end
 	```
 	# front-end proxy nginx to serve static
 	# back-end apache to serve dynamic
 	# https://www.linode.com/docs/uptime/loadbalancing/use-nginx-as-a-front-end-proxy-and-software-load-balancer/
 	
 	# serve apache on port 8000 (close 80 and 443)
+	# comment out all static on apache, as we will serve js or css through nginx
 	Listen 8000 # only
 	<VirtualHost *:8000> # on every vh
-	
-	# comment out all static on apache, as we will serve js or css through nginx
 	
 	sudo apt-get install libapache2-mod-rpaf # for log
 	```
@@ -335,10 +238,11 @@
 	}
 	```
 	```
-	# decrypt the private key 
-	openssl rsa -in server.key -out /etc/nginx/conf/server.key
-	
 	# nginx with ssl
+	# first decrypt the private key 
+	openssl rsa -in server.key -out /etc/nginx/ssl/server.key
+	
+	# vh
 	server {
 	   listen         80;
 	   server_name    domain.com;
@@ -366,7 +270,129 @@
 	}
 	```
 	
-11. ### torch and torch-rnn
+***
+
+## Python
+1. ### environments
+    ```
+	# in ubuntu, you should add dist-package as PYTHONPATH to .profile
+	export PYTHONPATH=/usr/lib/python2.7/dist-packages:/usr/local/lib/python2.7/dist-packages
+	
+    sudo apt-get install python-pip
+    sudo apt-get install python-dev
+	```
+	```
+	# config pip in aliyun
+	cd ~/.pip
+	vim pip.conf
+	
+	# pip.conf
+	[global]
+	index-url = http://mirrors.aliyun.com/pypi/simple/
+
+	[install]
+	trusted-host=mirrors.aliyun.com
+	```
+	```
+	# virtualenv
+	sudo pip install virtualenv
+	cd project
+	virtualenv venv
+	
+	# active virtual env
+	source bin/activate
+	pip something in this venv
+	deactivate
+	```
+	```
+	# python for mysql
+	sudo pip install MySQL-python
+	or ?
+	sudo pip install mysqlclient  
+	
+	# python for mongodb
+	sudo pip install pymongo
+	
+    sudo pip install sqlalchemy
+	```
+	```
+	# hdf5 file system
+	sudo apt-get install libhdf5-dev
+	
+	# install glib
+	sudo apt-get install libglib2.0-dev
+	sudo apt-get install libffi-dev
+	
+	# python markdown
+	sudo pip install misaka
+    ```
+    
+2. ### django
+    ```
+	sudo pip install django
+	
+    # sync django
+    python manage.py makemigrations
+    python manage.py migrate
+    ```
+    ``` python
+    # wsgi.py
+    import os
+    from os.path import dirname, abspath
+    
+    PROJECT_DIR = dirname(dirname(abspath(__file__)))
+    
+    import sys
+    sys.path.insert(0, PROJECT_DIR)
+    
+    os.environ["DJANGO_SETTINGS_MODULE"] = "DjangoApp.settings"
+    
+    from django.core.wsgi import get_wsgi_application
+    application = get_wsgi_application()
+	
+	# settings.py for deployment
+	DEBUG = False
+	ALLOWED_HOSTS = ['*']
+	
+	# if you have set up the venv for this django, 
+	# just make sure that you have set the venv path correctly in apache's conf. 
+	# django will automatically use the project's venv python path.
+    ```
+    
+    ```
+    # user uploading path
+    sudo chown -R www-data:www-data /upload
+    sudo chmod -R g+w /upload
+    ```
+	```python
+	# django with ssl
+	SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+	SECURE_SSL_REDIRECT = True # or using server to do the https redirect
+	SESSION_COOKIE_SECURE = True
+	```
+	
+3. ### flask
+	```
+	sudo pip install Flask
+	```
+	``` python
+	# app.wsgi
+	
+	# you can ignore the two lines below when you make sure that 
+	# you have set the venv path correctly in apache's conf.
+	# activate_this = '/home/user/projects/FlaskApp/venv/bin/activate_this.py'
+	# execfile(activate_this, dict(__file__=activate_this))
+
+	from yourapp import app as application
+
+	import sys
+	sys.path.insert(0, '/home/user/projects/FlaskApp')
+	```
+	
+***
+
+## Machine Learning Framework
+1. ### torch and torch-rnn
 	```
 	# python env
 	sudo apt-get install software-properties-common
@@ -380,7 +406,6 @@
 	```
 	```
 	# torch
-	sudo apt-get install git
 	git clone https://github.com/torch/distro.git torch --recursive
 	bash install-deps
 	./install.sh
@@ -400,21 +425,52 @@
 	# torch-rnn
 	git clone https://github.com/jcjohnson/torch-rnn
 	
-	python scripts/preprocess.py --input_txt my_data.txt --output_h5 my_data.h5 --output_json my_data.json
+	python scripts/preprocess.py 
+		--input_txt my_data.txt --output_h5 my_data.h5 --output_json my_data.json
 	
 	th train.lua -input_h5 my_data.h5 -input_json my_data.json -gpu -1
 	th sample.lua -checkpoint cv/checkpoint_10000.t7 -length 2000 -gpu -1
 	```
 	
-13. ### tensorflow
+2. ### tensorflow
 	```
-	waiting...
+	# Ubuntu/Linux 64-bit, CPU only, Python 2.7
+	(tensorflow)$ export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.10.0rc0-cp27-none-linux_x86_64.whl
+
+	# Ubuntu/Linux 64-bit, GPU enabled, Python 2.7
+	# Requires CUDA toolkit 7.5 and CuDNN v4. For other versions, see "Install from sources" below.
+	(tensorflow)$ export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.10.0rc0-cp27-none-linux_x86_64.whl
+	
+	sudo pip install --upgrade $TF_BINARY_URL
+	
+	# tensorflow is based on a new version of python-six
+	# but ubuntu 14.04 default python provides an old version of python-six
+	# and we can't upgrade it through apt-get
+	# solution is rm it by hand and then pip install a new one
 	```
 	
-14. ### mxnet
+3. ### mxnet
 	```
-	waiting...
+	sudo apt-get install build-essential libatlas-base-dev libopencv-dev
+	
+	git clone --recursive https://github.com/dmlc/mxnet
+	cd mxnet; make -j$(nproc)
+	
+	# quick test
+	python example/image-classification/train_mnist.py
 	```
 	
+***
+
+## Other
+### https
+```
+https://startssl.com/  > 1_root_bundle.crt, 2_your_domain.crt (for apache) 
+						 1_your_domain_bundle.crt (for nginx)
+
+# on server 
+openssl req -newkey rsa:2048 -keyout server.key -out server.csr
+```
+
 
 > If you have any problem, please contact hevlhayt@foxmail.com (ﾉﾟ▽ﾟ)ﾉ
