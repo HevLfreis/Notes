@@ -9,6 +9,7 @@
 	netstat -tap
 	kill -9 $(ps -e | grep xxx | awk '{print $1}')
 	sudo apt-get --purge autoremove xxx
+	visudo
 	
 	# screen
 	sudo apt-get install screen
@@ -22,7 +23,7 @@
 	```
 	sudo apt-get install git
 	
-	git commit -m 'update sth'  
+	git commit -a -m 'update sth'  
 	git reset --soft <sha>
 	git push --force
 	git rebase -i <sha>  
@@ -71,6 +72,10 @@
 	mkdir -p /data/db
 	sudo chown -R mongodb:mongodb /data
 	mongo
+	
+	# backup and restore
+	mongodump --db dbname --out dbdump
+	mongorestore --collection col --db dbname dbdump
 	```
 	
 ***
@@ -270,6 +275,26 @@
 	}
 	```
 	
+4. ### nodejs with nginx
+	```
+	server {
+		listen 80;
+		server_name domain.com;
+
+		location / {
+			proxy_pass http://localhost:8080;
+			include /etc/nginx/proxy_params;
+		}
+
+		location ~ ^/(images/|img/|javascript/|js/|css/|stylesheets/|flash/|media/|static/|robots.txt|humans.txt|favicon.ico){
+			root /home/hevlfreis/projects/Chat2x/public;
+			access_log off;
+			error_log off;
+		}
+
+	}
+	```
+	
 ***
 
 ## Python
@@ -387,6 +412,28 @@
 
 	import sys
 	sys.path.insert(0, '/home/user/projects/FlaskApp')
+	```
+	
+***
+
+## JS
+1. ### nodejs
+	```
+	sudo apt-get install nodejs
+	sudo apt-get install npm
+	
+	ln -s /usr/bin/nodejs /usr/bin/node
+	
+	sudo npm install forever -g
+	```
+	
+2. ### npm on win
+	```
+	# canvas
+	https://github.com/Automattic/node-canvas/wiki/Installation---Windows
+	
+	# node-gyp
+	https://github.com/nodejs/node-gyp
 	```
 	
 ***
