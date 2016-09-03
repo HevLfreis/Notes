@@ -9,6 +9,8 @@
 	netstat -tap
 	kill -9 $(ps -e | grep xxx | awk '{print $1}')
 	sudo apt-get --purge autoremove xxx
+	tar cvzf file.tar.gz /dir
+	tar -xvf file.tar.gz -C /dir
 	visudo
 	
 	# screen
@@ -282,7 +284,14 @@
 		server_name domain.com;
 
 		location / {
-			proxy_pass http://localhost:8080;
+			proxy_pass http://localhost:3000
+			
+			# avoid http400 while using sockit.io
+			proxy_http_version 1.1;
+			proxy_set_header Upgrade $http_upgrade;
+			proxy_set_header Connection "upgrade";
+			proxy_set_header Host $host;
+			
 			include /etc/nginx/proxy_params;
 		}
 
@@ -338,6 +347,7 @@
 	# python for mongodb
 	sudo pip install pymongo
 	
+	# orm for python
     sudo pip install sqlalchemy
 	```
 	```
@@ -424,11 +434,19 @@
 	
 	ln -s /usr/bin/nodejs /usr/bin/node
 	
-	sudo npm install forever -g
+	# cli tool for deployment
+	sudo npm install forever -g --save
+	
+	# mongodb odm for nodejs
+	npm install mongoose
 	```
 	
-2. ### npm on win
+2. ### npm
 	```
+	npm install (-g) <package>
+	```
+	```
+	# npm on win
 	# canvas
 	https://github.com/Automattic/node-canvas/wiki/Installation---Windows
 	
