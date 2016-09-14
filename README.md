@@ -68,7 +68,26 @@
 	app.config['SQLALCHEMY_POOL_RECYCLE'] = 1800
     ```
 	
-2. ### mongodb
+2. ### postgresql
+	```
+	sudo apt-get install libpq-dev postgresql postgresql-contrib
+	
+	# enter psql and setup passwd
+	sudo su - postgres
+	psql
+	\password postgres
+	
+	psql -U postgres -h localhost
+	
+	# backup and restore
+	pg_dump dbname > outfile
+	psql dbname < infile
+	
+	# connector for python
+	sudo pip install psycopg2
+	```
+	
+3. ### mongodb
 	```
 	sudo apt-get install mongodb
 	mkdir -p /data/db
