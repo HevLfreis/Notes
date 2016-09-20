@@ -33,6 +33,9 @@
 	git rm -r --cached .
 	git add .
 	git commit -m ".gitignore update"
+	
+	git branch
+	git branch -d xxx
 	```
 	
 ***
@@ -97,6 +100,34 @@
 	# backup and restore
 	mongodump --db dbname --out dbdump
 	mongorestore --collection col --db dbname dbdump
+	```
+
+4. ### memcached
+	```
+	sudo apt-get install memcached
+	
+	/usr/share/memcached/scripts/memcached-tool 127.0.0.1:11211 stats
+	```
+	```
+	# django integration
+	sudo pip install python-memcached
+	
+	# settings.py
+	MIDDLEWARE = [
+		'django.middleware.cache.UpdateCacheMiddleware',
+		...,
+		'django.middleware.cache.FetchFromCacheMiddleware',
+	]
+	
+	CACHES = {
+		'default': {
+			'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+			'LOCATION': '127.0.0.1:11211',
+		}
+	}
+	
+	@cache_page(60 * 15)
+	def my_view()
 	```
 	
 ***
@@ -309,7 +340,6 @@
 			proxy_http_version 1.1;
 			proxy_set_header Upgrade $http_upgrade;
 			proxy_set_header Connection "upgrade";
-			proxy_set_header Host $host;
 			
 			include /etc/nginx/proxy_params;
 		}
