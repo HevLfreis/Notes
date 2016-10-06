@@ -102,15 +102,20 @@
 	mongorestore --collection col --db dbname dbdump
 	```
 
-4. ### memcached
+4. ### memcached/redis cache
 	```
-	sudo apt-get install memcached
+	sudo apt-get install memcached	
+	sudo apt-get install redis
 	
-	/usr/share/memcached/scripts/memcached-tool 127.0.0.1:11211 stats
+	/usr/share/memcached/scripts/memcached-tool 127.0.0.1:11211 stats/display
+	
+	redis-cli ping
+	redis-cli flushall
 	```
 	```
 	# django integration
 	sudo pip install python-memcached
+	sudo pip install django-redis
 	
 	# settings.py
 	MIDDLEWARE = [
@@ -119,12 +124,24 @@
 		'django.middleware.cache.FetchFromCacheMiddleware',
 	]
 	
+	# memcached
 	CACHES = {
 		'default': {
 			'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
 			'LOCATION': '127.0.0.1:11211',
 		}
 	}
+	
+	# redis
+	CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": "redis://127.0.0.1:6379/1",
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            }
+        }
+    }
 	
 	@cache_page(60 * 15)
 	def my_view()
@@ -261,9 +278,10 @@
 	```
 	```
 	# /etc/nginx/proxy_params
-	proxy_set_header Host $host;
+	proxy_set_header Host $http_host;
 	proxy_set_header X-Real-IP $remote_addr;
 	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header X-Forwarded-Proto $scheme;
 
 	client_max_body_size 100M;
 	client_body_buffer_size 1m;
