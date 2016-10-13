@@ -36,6 +36,15 @@
 	
 	git branch
 	git branch -d xxx
+	
+	# remove file from all commits
+	git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch yourpath' --prune-empty --tag-name-filter cat -- --all
+
+	git push --force
+
+	git for-each-ref --format='delete %(refname)' refs/original | git update-ref --stdin
+	git reflog expire --expire=now --all
+	git gc --prune=now
 	```
 	
 ***
