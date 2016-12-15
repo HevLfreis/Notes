@@ -19,6 +19,12 @@
 	screen -ls
 	screen -r id/name
 	screen -X -S name quit
+	
+	# list all pkg
+	dpkg -l
+	
+	# remove confs and dependencies
+	sudo apt-get remove --purge --auto-remove <pkg>
 	```
 	
 2. ### git
@@ -91,9 +97,17 @@
 	
 	psql -U postgres -h localhost
 	
-	# backup and restore
+	# backup, restore and upgrade 9.3 to 9.4
 	pg_dump dbname > outfile
 	psql dbname < infile
+	
+	pg_dumpall -U postgres -h localhost > all.sql
+	sudo add-apt-repository "deb https://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main"
+	wget --quiet -O - https://postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - 
+	sudo apt-get update
+	sudo apt-get install postgresql-9.4
+	
+	psql -h localhost -f all.sql postgres
 	
 	# connector for python
 	sudo pip install psycopg2
@@ -440,7 +454,7 @@
     
 2. ### django
     ```
-	sudo pip install django
+	sudo pip install Django
 	
     # sync django
     python manage.py makemigrations
