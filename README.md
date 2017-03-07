@@ -101,6 +101,7 @@
 	pg_dump dbname > outfile
 	psql dbname < infile
 	
+	# delete postgresql 9.3 first
 	pg_dumpall -U postgres -h localhost > all.sql
 	sudo add-apt-repository "deb https://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main"
 	wget --quiet -O - https://postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - 
