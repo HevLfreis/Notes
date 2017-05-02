@@ -25,6 +25,16 @@
 	
 	# remove confs and dependencies
 	sudo apt-get remove --purge --auto-remove <pkg>
+	
+	# protect rm
+	alias cltf='tclean'
+	tclean() {
+	  /bin/rm -rf ~/.trash/*
+	}
+	alias rm='trash'
+	trash()  {  
+	  mv $@ ~/.trash/  
+	}
 	```
 	
 2. ### git
@@ -189,23 +199,23 @@
         ServerName djangoapp.domain.com
         # ServerAlias domain.com
         ServerAdmin hevlhayt@foxmail.com
-		
-		Alias /robots.txt /home/user/projects/DjangoApp/static/robots.txt
-		Alias /favicon.ico /home/user/projects/DjangoApp/static/favicon.ico
+        
+        Alias /robots.txt /home/user/projects/DjangoApp/static/robots.txt
+        Alias /favicon.ico /home/user/projects/DjangoApp/static/favicon.ico
         Alias /static/ /home/user/projects/DjangoApp/static/
     
         <Directory /home/user/projects/DjangoApp/static>
             Require all granted
         </Directory>
-		
-		WSGIDaemonProcess djangoapp python-path=/home/user/projects/DjangoApp:
-			/home/user/projects/DjangoApp/venv/lib/python2.7/site-packages 
-			processes=2 threads=15 display-name=%{GROUP}
-		WSGIProcessGroup djangoapp
+        
+        WSGIDaemonProcess djangoapp python-path=/home/user/projects/DjangoApp:
+            /home/user/projects/DjangoApp/venv/lib/python2.7/site-packages 
+            processes=2 threads=15 display-name=%{GROUP}
+        WSGIProcessGroup djangoapp
         WSGIScriptAlias / /home/user/projects/DjangoApp/DjangoApp/wsgi.py
-		
-		# solving the problem of python packages using native c like scipy
-		WSGIApplicationGroup %{GLOBAL}
+        
+        # solving the problem of python packages using native c like scipy
+        WSGIApplicationGroup %{GLOBAL}
     
         <Directory /home/user/projects/DjangoApp/DjangoApp>
         <Files wsgi.py>
@@ -217,19 +227,19 @@
 	```apacheconf
 	# apache flask
 	<VirtualHost *:80>
-		ServerName flaskapp.domain.com
+        ServerName flaskapp.domain.com
 
-		WSGIDaemonProcess flaskapp python-path=/home/user/projects/FlaskApp:
-			/home/user/projects/FlaskApp/venv/lib/python2.7/site-packages 
-			processes=2 threads=15 display-name=%{GROUP}
-		WSGIProcessGroup flaskapp
-		WSGIScriptAlias / /home/user/projects/FlaskApp/app.wsgi
-		WSGIApplicationGroup %{GLOBAL}
-		
-		<Directory /home/user/projects/FlaskApp>
-			Require all granted
-		</Directory>
-	</VirtualHost>
+        WSGIDaemonProcess flaskapp python-path=/home/user/projects/FlaskApp:
+            /home/user/projects/FlaskApp/venv/lib/python2.7/site-packages 
+            processes=2 threads=15 display-name=%{GROUP}
+        WSGIProcessGroup flaskapp
+        WSGIScriptAlias / /home/user/projects/FlaskApp/app.wsgi
+        WSGIApplicationGroup %{GLOBAL}
+
+        <Directory /home/user/projects/FlaskApp>
+            Require all granted
+        </Directory>
+    </VirtualHost>
     ```
 	```
 	# apache with ssl
@@ -239,7 +249,7 @@
 	netstat -tap  # https listening
 	```
 	```apacheconf
-	# add to site conf, with port 80
+	# add site conf, with port 80
 	# you can do http to https rewrite in apache or simply in django
 	# with front-end nginx, you can use the nginx to do it
 	RewriteEngine On
@@ -256,21 +266,21 @@
         <Directory /home/user/projects/WebApp/static>
             Require all granted
         </Directory>
-				
-		# no daemon settings
-		WSGIProcessGroup webapp
+    
+        # no daemon settings
+        WSGIProcessGroup webapp
         WSGIScriptAlias / /home/user/projects/WebApp/WebApp/wsgi.py
-		WSGIApplicationGroup %{GLOBAL}
+        WSGIApplicationGroup %{GLOBAL}
     
         <Directory /home/user/projects/WebApp/WebApp>
         <Files wsgi.py>
             Require all granted
         </Files>
         </Directory>
-		SSLEngine On
-		SSLCertificateFile "/etc/apache2/ssl/2_your_domain.crt"
-		SSLCertificateKeyFile "/etc/apache2/ssl/server.key"
-		SSLCertificateChainFile "/etc/apache2/ssl/1_root_bundle.crt"
+        SSLEngine On
+        SSLCertificateFile "/etc/apache2/ssl/2_your_domain.crt"
+        SSLCertificateKeyFile "/etc/apache2/ssl/server.key"
+        SSLCertificateChainFile "/etc/apache2/ssl/1_root_bundle.crt"
     </VirtualHost>
 	```
     ```
@@ -456,6 +466,10 @@
 2. ### django
     ```
 	sudo pip install Django
+	sudo pip install djangorestframework
+
+	# cross header for vue
+	sudo pip install django-cors-headers
 	
     # sync django
     python manage.py makemigrations
@@ -525,6 +539,9 @@
 	
 	ln -s /usr/bin/nodejs /usr/bin/node
 	
+	# cnpm for speed
+	npm install -g cnpm --registry="https://registry.npm.taobao.org"
+	
 	# cli tool for deployment
 	sudo npm install forever -g --save
 	
@@ -543,6 +560,22 @@
 	
 	# node-gyp
 	https://github.com/nodejs/node-gyp
+	```
+	
+3. ### vue
+	```
+	cnpm install webpack -g
+	npm install vue-cli -g
+	
+	vue init webpack-simple vueproj
+	
+	# inatall dependencies
+	npm install
+	
+	cnpm install vue-router vue-resource --save
+	
+	npm run dev
+	npm run build
 	```
 	
 ***
