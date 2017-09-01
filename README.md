@@ -8,10 +8,26 @@
     ps -aux
     netstat -tap
     kill -9 $(ps -e | grep xxx | awk '{print $1}')
-    sudo apt-get --purge autoremove xxx
-    tar cvzf file.tar.gz /dir
-    tar -xvf file.tar.gz -C /dir
+    
+    tar czvf file.tar.gz /dir
+    tar xzvf file.tar.gz -C /dir
+    
+    hostname -i
+    nslookup
+    
     visudo
+    
+    iconv -f utf8 -t gb2310 file
+    
+    chown chgrp chmod
+    
+    # disk
+    df -h
+    du -sh *
+    
+    # sed
+    sed -i 's/aaaa/bbbb/g'
+    sed -n '2p' file
     
     # screen
     sudo apt-get install screen

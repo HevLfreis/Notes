@@ -17,7 +17,7 @@
 | 20 | [Valid Parentheses](https://leetcode.com/problems/valid-parentheses/) | 栈的使用 |  |
 | 21 | [Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/) | 双指针齐头并进 | 链表 |
 | 22 | [Generate Parentheses](https://leetcode.com/problems/generate-parentheses/) | 括号生成的过程 |  |
-| 24 | [Swap Nodes in Pairs](https://leetcode.com/problems/swap-nodes-in-pairs/) | 循环内三指针 | 链表 |
+| 24 | [Swap Nodes in Pairs](https://leetcode.com/problems/swap-nodes-in-pairs/) | 虚拟头结点，交换后两个 | 链表 |
 | 26 | [Remove Duplicates from Sorted Array](https://leetcode.com/problems/remove-duplicates-from-sorted-array/) | 慢指针，数据前移 |  |
 | 27 | [Remove Element](https://leetcode.com/problems/remove-element/) | 同26 |  |
 | 33 | [Search in Rotated Sorted Array](https://leetcode.com/problems/search-in-rotated-sorted-array/) | 变种二分 | 二分 |
@@ -63,6 +63,7 @@
 | 215 | [Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/) | 快排思想，同理最大N个数 |  |
 | 263 | [Ugly Number](https://leetcode.com/problems/ugly-number/) | 除2，除3，除5 |  |
 | 264 | [Ugly Number II](https://leetcode.com/problems/ugly-number-ii/) | 三指针，三临时变量，保证有序 |  |
+| 264 | [String to Integer (atoi)](https://leetcode.com/problems/string-to-integer-atoi/) | 去空格，验证符号，检查溢出 |  |
 
 
 ## 理解思路
