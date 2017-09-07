@@ -63,7 +63,7 @@
 | 215 | [Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/) | 快排思想，同理最大N个数 |  |
 | 263 | [Ugly Number](https://leetcode.com/problems/ugly-number/) | 除2，除3，除5 |  |
 | 264 | [Ugly Number II](https://leetcode.com/problems/ugly-number-ii/) | 三指针，三临时变量，保证有序 |  |
-| 264 | [String to Integer (atoi)](https://leetcode.com/problems/string-to-integer-atoi/) | 去空格，验证符号，检查溢出 |  |
+| 8 | [String to Integer (atoi)](https://leetcode.com/problems/string-to-integer-atoi/) | 去空格，验证符号，检查溢出 |  |
 
 
 ## 理解思路
